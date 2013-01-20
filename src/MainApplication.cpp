@@ -46,7 +46,8 @@ void MainApplication::runConfiguration() {
     string fileNameInteractionElements = createFileName("interactionElements");
     string fileNameOrbitalElements = createFileName("orbitalElements");
 
-    if (!interactionElements.load(fileNameInteractionElements) || !orbitalElements.load(fileNameOrbitalElements)) {
+    if (!interactionElements.load(fileNameInteractionElements)
+            || !orbitalElements.load(fileNameOrbitalElements)) {
         cout << "Generating new orbital and interaction elements" << endl;
         basis.computeInteractionelements();
         basis.computeSpsEnergies();
@@ -58,7 +59,6 @@ void MainApplication::runConfiguration() {
         orbitalElements.save(fileNameOrbitalElements);
     } else
         cout << "Interaction and orbital matrix elements found. Loading matrices from file." << endl;
-
 
     // Setting up all Slater Determinants
     vector<vec> states = basis.getStates();
@@ -98,7 +98,7 @@ void MainApplication::runConfiguration() {
     // Printing results
     int integrator;
     cfg.lookupValue("spatialIntegration.integrator", integrator);
-    int samples;
+    int samples = 0;
 
     switch (integrator) {
     case MONTE_CARLO:
@@ -115,10 +115,11 @@ void MainApplication::runConfiguration() {
     // Calculating the correlation factor
     double k = correlationFactor(eigvec.col(0));
 
-    cout << "\nIntegrator \t Shells \t Samples \t Energy \t K \n";
+    cout << "\nIntegrator \t Shells \t Orbitals \t Samples \t Energy \t K \n";
     cout << "-------------------------------------------------------------------------\n"
          << integrator << " \t\t "
          << (int) cfg.lookup("systemSettings.shells") << " \t\t "
+         << orbitalElements.size() << " \t\t "
          << samples << " \t \t "
          << eigval.min() << " \t"
          << k << endl;
@@ -161,10 +162,11 @@ void MainApplication::runConfiguration() {
     for (int i = 0; i < end; i++) {
         T->stepForward();
         C = T->getCoefficients();
-
         overlap[i] = pow(abs(cdot(C, C0)), 2);
     }
     overlap.save(fileOverlap, arma_ascii);
+
+    cout << "Run Complete" << endl;
 }
 
 //------------------------------------------------------------------------------
@@ -197,13 +199,13 @@ string MainApplication::fName(string baseName)
     double w, L;
 
     cfg.lookupValue("systemSettings.w", w);
-    cfg.lookupValue("systemSettings.L", L);
     cfg.lookupValue("systemSettings.dim", dim);
     cfg.lookupValue("systemSettings.basisType", basisType);
     cfg.lookupValue("systemSettings.coordinateType", coordinateType);
     cfg.lookupValue("systemSettings.nParticles", nParticles);
     cfg.lookupValue("systemSettings.shells", shells);
     cfg.lookupValue("spatialIntegration.integrator", integrator);
+    cfg.lookupValue("spatialIntegration.L", L);
 
     if (integrator == MONTE_CARLO)
         cfg.lookupValue("spatialIntegration.MonteCarlo.samples", samples);
@@ -211,6 +213,8 @@ string MainApplication::fName(string baseName)
         cfg.lookupValue("spatialIntegration.GaussLaguerre.samples", samples);
     else if (integrator == GAUSS_HERMITE)
         cfg.lookupValue("spatialIntegration.GaussHermite.samples", samples);
+    else if (integrator == INTERACTION_INTEGRATOR)
+        samples = 0;
 
     ostringstream convert;
     convert << "_basisType-" << basisType << "_coordinateType-"<< coordinateType << "_dim-" << dim << "_integrator-" << integrator << "_samples-" << samples << "_nParticles-" << nParticles << "_w-" << w << "_L-" << L << "_shells-" << shells ;

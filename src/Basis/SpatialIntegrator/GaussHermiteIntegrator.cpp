@@ -42,19 +42,19 @@ GaussHermiteIntegrator::GaussHermiteIntegrator(Config *cfg) : SpatialIntegrator(
 }
 //------------------------------------------------------------------------------
 
-double GaussHermiteIntegrator::integrate(int p, int q, int r, int s) {
+double GaussHermiteIntegrator::integrate(const vec &p, const vec &q, const vec &r, const vec &s) {
     double I = 0;
     double A;
     for (int i = 0; i < N; i++) {
-        A = w1[i] * hermitePolynomial(p, x[i]) * hermitePolynomial(r, x[i]);
+        A = w1[i] * hermitePolynomial(p[1], x[i]) * hermitePolynomial(r[1], x[i]);
         for (int j = 0; j < N; j++) {
             I += A * w1[j]
-                    * hermitePolynomial(q, x[j])
-                    * hermitePolynomial(s, x[j])
+                    * hermitePolynomial(q[1], x[j])
+                    * hermitePolynomial(s[1], x[j])
                     / (sqrt(pow(x[i] - x[j], 2) / w + aa));
         }
     }
-    I *= 1 / (PI * sqrt(pow(2, p + q + r + s) * factorial(p) * factorial(q) * factorial(r) * factorial(s)));
+    I *= 1 / (PI * sqrt(pow(2, p[1] + q[1] + r[1] + s[1]) * factorial(p[1]) * factorial(q[1]) * factorial(r[1]) * factorial(s[1])));
 
 //    cout << "GH integration = " << I << endl;
 #if DEBUG
@@ -64,12 +64,9 @@ double GaussHermiteIntegrator::integrate(int p, int q, int r, int s) {
 }
 
 //------------------------------------------------------------------------------
-
 GaussHermiteIntegrator::GaussHermiteIntegrator(const GaussHermiteIntegrator & orig) {
 }
 //------------------------------------------------------------------------------
-
 GaussHermiteIntegrator::~GaussHermiteIntegrator() {
 }
-
 //------------------------------------------------------------------------------

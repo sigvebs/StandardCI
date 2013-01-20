@@ -155,6 +155,11 @@ void HamiltonMatrix::computeTimDepMatrixElements(int basisSize) {
             }
         }
     }
+
+#if DEBUG
+    cout << "computeTimDepMatrixElements(int basisSize)" << endl;
+    cout << Ht << endl;
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////

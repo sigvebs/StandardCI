@@ -11,7 +11,7 @@
 
 class OrbitalHarmonicOscillator: public Orbital {
 public:
-    OrbitalHarmonicOscillator();
+    OrbitalHarmonicOscillator(Config *cfg);
     OrbitalHarmonicOscillator(Setting* systemSettings, vec qN, int sp);
     OrbitalHarmonicOscillator(const OrbitalHarmonicOscillator& orig);
     virtual ~OrbitalHarmonicOscillator();

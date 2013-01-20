@@ -21,9 +21,11 @@
 #include "SpatialIntegrator/MonteCarloIntegrator.h"
 #include "SpatialIntegrator/GaussLaguerreIntegrator.h"
 #include "SpatialIntegrator/GaussHermiteIntegrator.h"
+#include "SpatialIntegrator/interactonintegrator.h"
 #include "../includes/lib.h"
-#include "../Orbital/Orbital.h"
-#include "../Orbital/OrbitalHarmonicOscillator.h"
+#include "../WaveFunction/wavefunction.h"
+#include "../WaveFunction/Implementations/harmonicoscillator1d.h"
+#include "../WaveFunction/Implementations/harmonicoscillator2d.h"
 
 using namespace libconfig;
 using namespace std;
@@ -37,7 +39,9 @@ public:
     virtual ~Basis();
 
     void createBasis();
-    
+    void createCartesianBasis();
+    void createPolarBasis();
+
     void computeSpsEnergies();
     vec getSpsEnergies();
     
@@ -51,22 +55,28 @@ public:
     double waveFunction(double x, int n);
     double integrator(int p, int q, int r, int s);
     double expX(int p, int q);
+
     
-private:
+protected:
     //Setting* systemSettings;
     Config *cfg;
 
     string basisName;
     
     int sIntegrator;
+    int coordinateType;
+
+    // To be removed
     int dim;
     int shells;
     double w;
     double sqrtW;
+
     int maxRange;
     
     vector<vec> states;
-    vector<Orbital*> orbitalStates;
+    //vector<Orbital*> orbitalStates;
+    WaveFunction *wf;
     mat intElements;
     vec spsEnergies;
     

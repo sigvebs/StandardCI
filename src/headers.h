@@ -13,15 +13,18 @@ extern "C" {
 #endif
 
     //#define DEBUG 0
-#define BITS 64
+#define BITS 96
 #define BUF_SIZE 33
 #define PI 3.1415926535897932384626433832795028841971693993751058209749445923078164
 
-enum tIntegrator {
+enum tIntegratorDEF {
     FORWARD_EULER, BACKWARD_EULER, CRANK_NICOLSON
 };
-enum sIntegrator {
-    MONTE_CARLO, GAUSS_LAGUERRE, GAUSS_HERMITE
+enum sIntegratorDEF {
+    MONTE_CARLO, GAUSS_LAGUERRE, GAUSS_HERMITE, INTERACTION_INTEGRATOR
+};
+enum coordinateTypesDEF {
+    CARTESIAN, POLAR
 };
 
 #ifdef	__cplusplus

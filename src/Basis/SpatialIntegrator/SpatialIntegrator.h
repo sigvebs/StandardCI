@@ -15,6 +15,7 @@
 #include <libconfig.h++>
 
 #include "../../headers.h"
+#include "../../WaveFunction/wavefunction.h"
 
 using namespace libconfig;
 using namespace std;
@@ -26,14 +27,19 @@ class SpatialIntegrator {
 public:
     SpatialIntegrator();
     SpatialIntegrator(Config *cfg);
+    SpatialIntegrator(Config *cfg, WaveFunction *wf);
     SpatialIntegrator(const SpatialIntegrator& orig);
     virtual ~SpatialIntegrator();
-    
-    virtual double integrate(int p, int q, int r, int s) = 0;
+
+    virtual double integrate(const vec &p, const vec &q, const vec &r, const vec &s) = 0;
 
 protected:
+    WaveFunction *wf;
+    int dim;
     double w, sqrtW, a, aa;
     
+    // TODO: should not be in this class. Remove when WF has been implemented
+    // trough the entire program.
     double hermitePolynomial(const int degree, const double x);
 };
 

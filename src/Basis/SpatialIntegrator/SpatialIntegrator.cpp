@@ -18,6 +18,18 @@ SpatialIntegrator::SpatialIntegrator(Config *cfg) {
     try {
         cfg->lookupValue("potential.a", a);
         cfg->lookupValue("systemSettings.w", w);
+        dim = cfg->lookup("systemSettings.dim");
+        aa = a*a;
+        sqrtW = sqrt(w);
+     } catch (const SettingNotFoundException &nfex) {
+        cerr << "Basis::Basis(Setting* systemSettings)::Error reading from 'systemSettings' object setting." << endl;
+    }
+}//------------------------------------------------------------------------------
+
+SpatialIntegrator::SpatialIntegrator(Config *cfg, WaveFunction *wf): wf(wf) {
+    try {
+        cfg->lookupValue("potential.a", a);
+        cfg->lookupValue("systemSettings.w", w);
         aa = a*a;
         sqrtW = sqrt(w);
      } catch (const SettingNotFoundException &nfex) {

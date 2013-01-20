@@ -1,36 +1,13 @@
-/* 
- * File:   OrbitalHarmonicOscillator.cpp
- * Author: sigve
- * 
- * Created on December 28, 2012, 3:32 PM
- */
-#include "OrbitalHarmonicOscillator.h"
+#include "harmonicoscillator.h"
 
 //------------------------------------------------------------------------------
-
-OrbitalHarmonicOscillator::OrbitalHarmonicOscillator(Config *cfg) {
+HarmonicOscillator::HarmonicOscillator(Config *cfg): WaveFunction(cfg)
+{
     try {
-        w = cfg->lookup("w");
-        dim = cfg->lookup("dim");
-    } catch (const SettingNotFoundException &nfex) {
-        cerr << "OrbitalHarmonicOscillator::"
-             << "Error reading from 'systemSettings' object setting." << endl;
-    }
-    sqrtW = sqrt(w);
-#if DEBUG
-    cout << "OrbitalHarmonicOscillator::OrbitalHarmonicOscillator(Config *cfg)" << endl;
-    cout << "w = " << w << endl;
-    cout << "dim = " << dim << endl;
-#endif
-}
-
-//------------------------------------------------------------------------------
-
-OrbitalHarmonicOscillator::OrbitalHarmonicOscillator(Setting* systemSettings, vec quantumNumbers, int spin) : quantumNumbers(quantumNumbers), spin(spin) {
-
-    try {
-        systemSettings->lookupValue("w", w);
-        systemSettings->lookupValue("dim", dim);
+        w = cfg->lookup("systemSettings.w");
+        dim = cfg->lookup("systemSettings.dim");
+        aa = cfg->lookup("potential.a");
+        aa *= aa;
     } catch (const SettingNotFoundException &nfex) {
         cerr << "OrbitalHarmonicOscillator::Error reading from 'systemSettings' object setting." << endl;
     }
@@ -43,43 +20,9 @@ OrbitalHarmonicOscillator::OrbitalHarmonicOscillator(Setting* systemSettings, ve
     cout << "spin = " << spin << endl;
 #endif
 }
-
 //------------------------------------------------------------------------------
-
-OrbitalHarmonicOscillator::OrbitalHarmonicOscillator(const OrbitalHarmonicOscillator& orig) {
-}
-
-//------------------------------------------------------------------------------
-
-OrbitalHarmonicOscillator::~OrbitalHarmonicOscillator() {
-}
-
-//------------------------------------------------------------------------------
-
-double OrbitalHarmonicOscillator::evaluate(vec x) {
-#if DEBUG
-    cout << "OrbitalHarmonicOscillator::evaluate(vec x)" << endl;
-    cout << "x = " << w << endl;
-    cout << "quantumNumbers = " << quantumNumbers << endl;
-#endif
-    /*
-    double wf = 1;
-    for (int i = 0; i < dim; i++) {
-        wf *= hermitePolynomial(p, sqrtW * x)
-                * hermitePolynomial(q, sqrtW * y)
-                * hermitePolynomial(r, sqrtW * x)
-                * hermitePolynomial(s, sqrtW * y)
-                / (sqrt(pow(x - y, 2) + aa));
-    }
-    wf *= exp(-w * dot(x, x) / 2.0);
-*/
-    double wf = 1;
-    return wf;
-}
-
-//------------------------------------------------------------------------------
-
-double OrbitalHarmonicOscillator::hermitePolynomial(const int n, const double x) {
+double HarmonicOscillator::hermitePolynomial(const int n, const double x)
+{
     double hermite_polynomial;
 
     switch (n) {
@@ -123,3 +66,4 @@ double OrbitalHarmonicOscillator::hermitePolynomial(const int n, const double x)
     }
     return hermite_polynomial;
 }
+//------------------------------------------------------------------------------

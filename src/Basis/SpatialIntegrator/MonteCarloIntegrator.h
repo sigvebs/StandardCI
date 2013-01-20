@@ -17,7 +17,7 @@ public:
     MonteCarloIntegrator(const MonteCarloIntegrator& orig);
     virtual ~MonteCarloIntegrator();
 
-    virtual double integrate(int p, int q, int r, int s);
+    virtual double integrate(const vec &p, const vec &q, const vec &r, const vec &s);
 private:
     int mcSamples;
     long idum;

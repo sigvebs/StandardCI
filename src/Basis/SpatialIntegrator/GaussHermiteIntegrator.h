@@ -16,8 +16,7 @@ public:
     GaussHermiteIntegrator(Config *cfg);
     GaussHermiteIntegrator(const GaussHermiteIntegrator& orig);
     virtual ~GaussHermiteIntegrator();
-
-    virtual double integrate(int p, int q, int r, int s);
+    virtual double integrate(const vec &p, const vec &q, const vec &r, const vec &s);
 private:
     int N;
     double *x;
