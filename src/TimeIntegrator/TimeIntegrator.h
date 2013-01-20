@@ -23,13 +23,8 @@ using namespace arma;
 
 class TimeIntegrator {
 public:
-    TimeIntegrator();
     TimeIntegrator(Config *cfg, HamiltonMatrix *H, cx_vec C);
-    TimeIntegrator(const TimeIntegrator& orig);
-    virtual ~TimeIntegrator();
-    
     virtual void stepForward() = 0;
-    
     cx_vec getCoefficients();
 protected:
     int N;

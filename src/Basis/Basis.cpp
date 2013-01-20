@@ -1,32 +1,25 @@
 /* 
  * File:   Basis.cpp
  * Author: sigve
- * 
+ *
  * Created on January 7, 2013, 4:22 PM
  */
 
 #include "Basis.h"
 
 //------------------------------------------------------------------------------ 
-
-Basis::Basis() {
-}
-
-//------------------------------------------------------------------------------ 
-
-Basis::Basis(Config *cfg) : cfg(cfg) {
+Basis::Basis(Config *cfg) : cfg(cfg)
+{
     try {
-        w               = cfg->lookup("systemSettings.w");
         dim             = cfg->lookup("systemSettings.dim");
         coordinateType  = cfg->lookup("systemSettings.coordinateType");
         shells          = cfg->lookup("systemSettings.shells");
         sIntegrator     = cfg->lookup("spatialIntegration.integrator");
-        int basisType   = cfg->lookup("systemSettings.basisType");
     } catch (const SettingNotFoundException &nfex) {
         cerr << "Basis::Basis(Setting* systemSettings)::Error reading from 'systemSettings' object setting." << endl;
     }
-    sqrtW = sqrt(w);
 
+    // Setting the type of basis
     switch(dim){
     case 1:
         wf = new HarmonicOscillator1d(cfg);
@@ -36,17 +29,30 @@ Basis::Basis(Config *cfg) : cfg(cfg) {
         break;
     }
 
+    // Setting the integrator
+    switch (sIntegrator) {
+    case MONTE_CARLO:
+        I = new MonteCarloIntegrator(cfg);
+        break;
+    case GAUSS_LAGUERRE:
+        I = new GaussLaguerreIntegrator(cfg, wf);
+        break;
+    case GAUSS_HERMITE:
+        I = new GaussHermiteIntegrator(cfg);
+        break;
+    case INTERACTION_INTEGRATOR:
+        I = new InteractonIntegrator(cfg);
+        break;
+    }
+
 #if DEBUG
     cout << "Basis::Basis(Setting* systemSettings)" << endl;
-    cout << "w = " << w << endl;
     cout << "dim = " << dim << endl;
 #endif
 }
-
 //------------------------------------------------------------------------------ 
 void Basis::createBasis()
 {
-
     switch(coordinateType){
     case CARTESIAN:
         createCartesianBasis();
@@ -60,9 +66,9 @@ void Basis::createBasis()
 void Basis::createCartesianBasis()
 {
     // Generating all single particle states and energies
+    // TODO: generalize to different quantum numbers.
     vec state = zeros(4);
 
-    // TODO: generalize to different quantum numbers.
     switch (dim) {
     case 1:
         for (int n = 0; n <= shells; n++) {
@@ -84,11 +90,11 @@ void Basis::createCartesianBasis()
                     if(nx + ny == s){
                         for (int spin = 1; spin >= -1; spin -= 2) {
 
-                        state(0) = states.size();
-                        state(1) = nx;
-                        state(2) = ny;
-                        state(3) = spin;
-                        states.push_back(state);
+                            state(0) = states.size();
+                            state(1) = nx;
+                            state(2) = ny;
+                            state(3) = spin;
+                            states.push_back(state);
                         }
                     }
                 }
@@ -99,8 +105,8 @@ void Basis::createCartesianBasis()
     cout << states.size() << " orbitals created" << endl;
 #if DEBUG
     cout << "void Basis::createBasis()" << endl;
-    for (int i = 0; i < states.size(); i++) {
-        for (int j = 0; j < states[0].n_elem; j++) {
+    for (int i = 0; i < (int)states.size(); i++) {
+        for (int j = 0; j < (int)states[0].n_elem; j++) {
             cout << states[i][j] << " ";
         }
         cout << endl;
@@ -152,31 +158,11 @@ void Basis::createPolarBasis()
 #endif
 }
 //------------------------------------------------------------------------------ 
-
-/**
- * Computes all the interaction-elements between all possible configurations 
- * of orbitals.
- */
-void Basis::computeInteractionelements() {
+void Basis::computeInteractionelements()
+{
     cout << "Computing interaction elements" << endl;
 
     double tolerance = 1e-6;
-    SpatialIntegrator *I;
-
-    switch (sIntegrator) {
-    case MONTE_CARLO:
-       I = new MonteCarloIntegrator(cfg);
-        break;
-    case GAUSS_LAGUERRE:
-         I = new GaussLaguerreIntegrator(cfg, wf);
-        break;
-    case GAUSS_HERMITE:
-         I = new GaussHermiteIntegrator(cfg);
-        break;
-    case INTERACTION_INTEGRATOR:
-         I = new InteractonIntegrator(cfg);
-        break;
-    }
 
     int nStates = states.size();
     double E;
@@ -208,6 +194,7 @@ void Basis::computeInteractionelements() {
         }
     }
     cout << "Done " << endl;
+
     // Storing results in a matrix
     int nInteractionElements = interactionElements.size();
     intElements = zeros(nInteractionElements, 5);
@@ -220,21 +207,20 @@ void Basis::computeInteractionelements() {
     cout << "InteractionELements = " << interactionElements.size() << endl;
 #endif
 }
-
 //------------------------------------------------------------------------------ 
-
-mat Basis::getInteractionElements() {
+mat Basis::getInteractionElements()
+{
     return intElements;
 }
 //------------------------------------------------------------------------------ 
-
-void Basis::computeSpsEnergies() {
+void Basis::computeSpsEnergies()
+{
     cout << "Computing orbital energies" << endl;
     int nStates = states.size();
     spsEnergies = zeros(nStates, 1);
 
     // Computing the one body operators
-    for (int i = 0; i < states.size(); i++) {
+    for (int i = 0; i < (int)states.size(); i++) {
         spsEnergies[i] = wf->getEnergy(states[i]);
     }
 #if DEBUG
@@ -242,19 +228,14 @@ void Basis::computeSpsEnergies() {
     cout << "spsEnergies = " << spsEnergies << endl;
 #endif
 }
-
 //------------------------------------------------------------------------------ 
-
-vec Basis::getSpsEnergies() {
+vec Basis::getSpsEnergies()
+{
     return spsEnergies;
 }
 //------------------------------------------------------------------------------ 
-
-vector<vec> Basis::getStates(){
+vector<vec> Basis::getStates()
+{
     return states;
 }
-
 //------------------------------------------------------------------------------ 
-
-Basis::~Basis() {
-}

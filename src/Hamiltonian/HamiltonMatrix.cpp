@@ -7,20 +7,11 @@
 
 #include "HamiltonMatrix.h"
 
-//------------------------------------------------------------------------------
-
-HamiltonMatrix::HamiltonMatrix() {
-}
 
 //------------------------------------------------------------------------------
-
-HamiltonMatrix::HamiltonMatrix(const HamiltonMatrix& orig) {
-}
-
-//------------------------------------------------------------------------------
-
 HamiltonMatrix::HamiltonMatrix(Config *cfg, vector<bitset<BITS> > slaterDeterminants, mat interactions, vec spsEnergy) :
-cfg(cfg), slaterDeterminants(slaterDeterminants), interactions(interactions), spsEnergy(spsEnergy) {
+cfg(cfg), slaterDeterminants(slaterDeterminants), interactions(interactions), spsEnergy(spsEnergy)
+{
     try {
         w = cfg->lookup("systemSettings.w");
         e0 = cfg->lookup("systemSettings.e0");
@@ -37,13 +28,8 @@ cfg(cfg), slaterDeterminants(slaterDeterminants), interactions(interactions), sp
 #endif
 }
 //------------------------------------------------------------------------------
-
-HamiltonMatrix::~HamiltonMatrix() {
-}
-
-//------------------------------------------------------------------------------
-
-void HamiltonMatrix::computeMatrixElements() {
+void HamiltonMatrix::computeMatrixElements()
+{
     cout << "Setting up the Hamilton matrix " << endl;
     int phase;
     int nStates = slaterDeterminants.size();
@@ -55,7 +41,7 @@ void HamiltonMatrix::computeMatrixElements() {
     Ht = zeros(nStates, nStates);
 
     for (int st = 0; st < nStates; st++) {
-        for (int b = 0; b < interactions.n_rows; b++) {
+        for (int b = 0; b < (int)interactions.n_rows; b++) {
             newState = slaterDeterminants[st];
             i = interactions(b, 0);
             j = interactions(b, 1);
@@ -80,9 +66,10 @@ void HamiltonMatrix::computeMatrixElements() {
             if (newState[BITS - 1] != 1) {
                 interactionElement = interactions(b, 4);
                 // Searching for the new state to compute the matrix elements.
-                for (int st2 = 0; st2 < slaterDeterminants.size(); st2++) {
+                for (int st2 = 0; st2 < (int)slaterDeterminants.size(); st2++) {
                     if (newState == slaterDeterminants[st2]) {
                         H(st, st2) += interactionElement * phase;
+                        break;
                     }
                 }
             }
@@ -104,10 +91,9 @@ void HamiltonMatrix::computeMatrixElements() {
     cout << "Completed generating the Hamilton matrix" << endl;
 #endif
 }
-
 //------------------------------------------------------------------------------
-
-void HamiltonMatrix::computeTimDepMatrixElements(int basisSize) {
+void HamiltonMatrix::computeTimDepMatrixElements(int basisSize)
+{
     cout << "Setting up the time dependent part of the Hamilton matrix." << endl;
     int phase;
     int nStates = slaterDeterminants.size();
@@ -116,9 +102,9 @@ void HamiltonMatrix::computeTimDepMatrixElements(int basisSize) {
     double interactionElement = 1.0 / sqrt(2 * w);
 
     for (int st = 0; st < nStates; st++) {
-        for (int p = 0; p < basisSize - 1; p++) {
-            
-            // <Psi'|Psi^{p+1}_p>
+        for (int p = 0; p < basisSize-1; p++) {
+
+            // <Psi'|Psi^p_{p+1}>
             newState = slaterDeterminants[st];
             phase = 1;
 
@@ -127,17 +113,18 @@ void HamiltonMatrix::computeTimDepMatrixElements(int basisSize) {
 
             newState = addParticle(p, newState);
             phase *= sign(p, newState);
+
             if (newState[BITS - 1] != 1) {
-                for (int st2 = 0; st2 < slaterDeterminants.size(); st2++) {
+                for (int st2 = 0; st2 < (int)slaterDeterminants.size(); st2++) {
                     if (newState == slaterDeterminants[st2]) {
-                        Ht(st, st2) += interactionElement * phase;
+                        Ht(st, st2) += sqrt(p+1)*interactionElement * phase;
+                        break;
                     }
                 }
             }
 
             // <Psi'|Psi^{p+1}_p>
             newState = slaterDeterminants[st];
-
             phase = 1;
 
             newState = removeParticle(p, newState);
@@ -147,9 +134,10 @@ void HamiltonMatrix::computeTimDepMatrixElements(int basisSize) {
             phase *= sign(p + 1, newState);
 
             if (newState[BITS - 1] != 1) {
-                for (int st2 = 0; st2 < slaterDeterminants.size(); st2++) {
+                for (int st2 = 0; st2 < (int)slaterDeterminants.size(); st2++) {
                     if (newState == slaterDeterminants[st2]) {
-                        Ht(st, st2) += interactionElement * phase;
+                        Ht(st, st2) += sqrt(p+1)*interactionElement * phase;
+                        break;
                     }
                 }
             }
@@ -161,9 +149,7 @@ void HamiltonMatrix::computeTimDepMatrixElements(int basisSize) {
     cout << Ht << endl;
 #endif
 }
-
-////////////////////////////////////////////////////////////////////////////////
-
+//------------------------------------------------------------------------------
 int HamiltonMatrix::sign(int n, bitset<BITS> state) {
     int s = 1;
     for (int i = 0; i < n; i++) {
@@ -173,9 +159,7 @@ int HamiltonMatrix::sign(int n, bitset<BITS> state) {
     }
     return s;
 }
-
 //------------------------------------------------------------------------------
-
 bitset<BITS> HamiltonMatrix::addParticle(int n, bitset<BITS> state) {
     // Vacuum state
     if (state[BITS - 1])
@@ -194,9 +178,7 @@ bitset<BITS> HamiltonMatrix::addParticle(int n, bitset<BITS> state) {
 
     return state;
 }
-
 //------------------------------------------------------------------------------
-
 bitset<BITS> HamiltonMatrix::removeParticle(int n, bitset<BITS> state) {
     // Vacuum state
     if (state[BITS - 1])
@@ -215,33 +197,24 @@ bitset<BITS> HamiltonMatrix::removeParticle(int n, bitset<BITS> state) {
 
     return state;
 }
-
 //------------------------------------------------------------------------------
-
 mat HamiltonMatrix::getHamiltonian() {
     return H;
 }
-
 //------------------------------------------------------------------------------
-
 mat HamiltonMatrix::operator()(double t) {
     return H + e0*sin(wLaser*t)*Ht;
 }
-
 //------------------------------------------------------------------------------
-
 void HamiltonMatrix::setHamiltonian(mat h) {
     H = h;
     Ht = zeros(h.n_rows ,h.n_cols);
 }
-
 //------------------------------------------------------------------------------
-
 mat HamiltonMatrix::evaluate(double t) {
     return H + e0*sin(wLaser*t)*Ht;
 }
 //------------------------------------------------------------------------------
-
 int HamiltonMatrix::getDim() {
     return H.n_cols;
 }

@@ -12,15 +12,8 @@
 
 class ForwardEuler: public TimeIntegrator {
 public:
-    ForwardEuler();
     ForwardEuler(Config *cfg, HamiltonMatrix *H, cx_vec C);
-    ForwardEuler(const ForwardEuler& orig);
-    virtual ~ForwardEuler();
-    
     virtual void stepForward();
-private:
-    
-
 };
 
 #endif	/* FORWARDEULER_H */

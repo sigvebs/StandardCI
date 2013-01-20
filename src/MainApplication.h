@@ -14,9 +14,6 @@
 #include <libconfig.h++>
 #include <sstream>
 
-#include "Orbital/Orbital.h"
-#include "Orbital/OrbitalHarmonicOscillator.h"
-#include "Integration/Integrator.h"
 #include "Basis/Basis.h"
 #include "SlaterDeterminants/SlaterDeterminants.h"
 #include "Hamiltonian/HamiltonMatrix.h"
@@ -29,9 +26,7 @@ using namespace libconfig;
 
 class MainApplication {
 public:
-    MainApplication();
     MainApplication(int* argc, char ***argv, string configFileName = "config.cfg");
-    virtual ~MainApplication();
 
     void runConfiguration();
     void finalize();
@@ -39,6 +34,7 @@ public:
     string fName(string baseName);
     double correlationFactor(vec p);
     void removeFiles();
+    string results();
 private:
     int* argc;
     char*** argv;

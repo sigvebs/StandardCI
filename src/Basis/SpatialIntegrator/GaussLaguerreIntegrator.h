@@ -12,7 +12,6 @@
 
 class GaussLaguerreIntegrator: public SpatialIntegrator {
 public:
-    GaussLaguerreIntegrator();
     GaussLaguerreIntegrator(Config *cfg, WaveFunction *wf);
     GaussLaguerreIntegrator(const GaussLaguerreIntegrator& orig);
     virtual ~GaussLaguerreIntegrator();

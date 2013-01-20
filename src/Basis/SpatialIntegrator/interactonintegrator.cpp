@@ -7,7 +7,7 @@ InteractonIntegrator::InteractonIntegrator(Config *cfg): SpatialIntegrator(cfg)
 //------------------------------------------------------------------------------
 double InteractonIntegrator::integrate(const vec &p, const vec &q, const vec &r, const vec &s)
 {
-    return coulomb(p[1], p[2], q[1], q[2], s[1], s[2], r[1], r[2]);
+    return sqrtW*coulomb(p[1], p[2], q[1], q[2], s[1], s[2], r[1], r[2]);
 }
 //------------------------------------------------------------------------------
 double InteractonIntegrator::coulomb (const int n1, const int m1, const int n2, const int m2, const int n3, const int m3, const int n4, const int m4)

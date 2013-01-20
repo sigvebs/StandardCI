@@ -8,12 +8,6 @@
 #include "MainApplication.h"
 
 //------------------------------------------------------------------------------
-
-MainApplication::MainApplication() {
-}
-
-//------------------------------------------------------------------------------
-
 MainApplication::MainApplication(int* argc, char*** argv, string configFileName) : argc(argc), argv(argv) {
     cout << configFileName << endl;
     // Read the file. If there is an error, report it and exit.
@@ -27,9 +21,7 @@ MainApplication::MainApplication(int* argc, char*** argv, string configFileName)
     cout << "Reading configuration from file" << endl;
 #endif
 }
-
 //------------------------------------------------------------------------------
-
 void MainApplication::runConfiguration() {
 
     bool cleanFiles = cfg.lookup("systemSettings.cleanFiles");
@@ -82,7 +74,12 @@ void MainApplication::runConfiguration() {
         cout << "Hamilton matrix found. Loading matrix from file." << endl;
         H.setHamiltonian(h);
     }
+
+//    string fileNameImgHamiltonian = createFileName("imageHamiltonian");
+//    mat hImage = 50*h;
+//    hImage.save(fileNameImgHamiltonian, pgm_binary);
     
+
     // Finding the initial ground state
     vec eigval;
     mat eigvec;
@@ -102,7 +99,7 @@ void MainApplication::runConfiguration() {
 
     switch (integrator) {
     case MONTE_CARLO:
-       cfg.lookupValue("spatialIntegration.MonteCarlo.samples", samples);
+        cfg.lookupValue("spatialIntegration.MonteCarlo.samples", samples);
         break;
     case GAUSS_LAGUERRE:
         cfg.lookupValue("spatialIntegration.GaussLaguerre.samples", samples);
@@ -112,89 +109,89 @@ void MainApplication::runConfiguration() {
         break;
     }
 
-    // Calculating the correlation factor
+    // Printing results
     double k = correlationFactor(eigvec.col(0));
-
-    cout << "\nIntegrator \t Shells \t Orbitals \t Samples \t Energy \t K \n";
+    double w = cfg.lookup("systemSettings.w");
+    cout << "\nIntegrator \t Shells \t Orbitals \t w \t Energy \t K \t Samples \n";
     cout << "-------------------------------------------------------------------------\n"
          << integrator << " \t\t "
          << (int) cfg.lookup("systemSettings.shells") << " \t\t "
          << orbitalElements.size() << " \t\t "
-         << samples << " \t \t "
+         << w << " \t "
          << eigval.min() << " \t"
-         << k << endl;
+         << k << "\t"
+         << samples << endl;
     cout << "-------------------------------------------------------------------------\n";
 
+
     // Time integration
-    string fileOverlap = createFileName("overlap");
-    H.computeTimDepMatrixElements(orbitalElements.n_rows);
-    int nCI = eigvec.n_rows;
-    cx_vec C0(nCI);
-    C0.set_real(eigvec.col(0));
-    C0.set_imag(zeros(nCI, 1));
-    TimeIntegrator *T;
-    int tIntegrator = cfg.lookup("TimeIntegration.TimeIntegrator");
+    // Plotting resutls
+    bool tIntegration;
+    tIntegration = cfg.lookup("systemSettings.timeIntegration");
+    if(tIntegration){
+        string fileOverlap = createFileName("overlap");
+        H.computeTimDepMatrixElements(orbitalElements.n_rows);
+        int nCI = eigvec.n_rows;
+        cx_vec C0(nCI);
+        C0.set_real(eigvec.col(0));
+        C0.set_imag(zeros(nCI, 1));
+        TimeIntegrator *T;
+        int tIntegrator = cfg.lookup("TimeIntegration.TimeIntegrator");
 
-    switch (tIntegrator) {
-    case FORWARD_EULER:
-        T = new ForwardEuler(&cfg, &H, C0);
-        break;
-    case BACKWARD_EULER:
-        cout << "BackwardEuler not yet implemented." << endl;
-        break;
-    case CRANK_NICOLSON:
-        T = new CrankNicolson(&cfg, &H, C0);
-        break;
+        switch (tIntegrator) {
+        case FORWARD_EULER:
+            T = new ForwardEuler(&cfg, &H, C0);
+            break;
+        case BACKWARD_EULER:
+            cout << "BackwardEuler not yet implemented." << endl;
+            break;
+        case CRANK_NICOLSON:
+            T = new CrankNicolson(&cfg, &H, C0);
+            break;
+        }
+
+        double wLaser = cfg.lookup("systemSettings.wLaser");
+        wLaser *= w;
+        double dt = cfg.lookup("TimeIntegration.dt");
+        int end = floor(8*PI/(wLaser*dt));
+
+        cx_vec C(nCI);
+        cx_vec CPrev(nCI);
+        vec overlap(end);
+        C = C0;
+        CPrev = C;
+
+        for (int i = 0; i < end; i++) {
+            T->stepForward();
+            C = T->getCoefficients();
+            overlap[i] = pow(abs(cdot(C, C0)), 2);
+        }
+        overlap.save(fileOverlap, arma_ascii);
+
+        // Plotting resutls
+        bool plotResult;
+        plotResult = cfg.lookup("systemSettings.plotResult");
+        if(plotResult)
+            system("cd ..; cd PlottingResults; python plottingOverlap.py");
     }
-
-    double w = cfg.lookup("systemSettings.w");
-    double wLaser = cfg.lookup("systemSettings.wLaser");
-    wLaser *= w;
-    double dt = cfg.lookup("TimeIntegration.dt");
-    int end = floor(8*PI/(wLaser*dt));
-
-    cx_vec C(nCI);
-    cx_vec CPrev(nCI);
-    vec overlap(end);
-    C = C0;
-    CPrev = C;
-
-    for (int i = 0; i < end; i++) {
-        T->stepForward();
-        C = T->getCoefficients();
-        overlap[i] = pow(abs(cdot(C, C0)), 2);
-    }
-    overlap.save(fileOverlap, arma_ascii);
-
     cout << "Run Complete" << endl;
 }
-
 //------------------------------------------------------------------------------
-
 void MainApplication::finalize() {
 
 }
-
 //------------------------------------------------------------------------------
-
-MainApplication::~MainApplication() {
-
-}
-
-//------------------------------------------------------------------------------
-
-string MainApplication::createFileName(string baseName) {
+string MainApplication::createFileName(string baseName)
+{
     string path;
     cfg.lookupValue("systemSettings.SIpath", path);
     return path + fName(baseName);
 }
-
 //------------------------------------------------------------------------------
-
 string MainApplication::fName(string baseName)
 {
     string fileName;
-//    string integrator;
+    //    string integrator;
     int integrator, shells, dim, nParticles, samples, basisType, coordinateType;
     double w, L;
 
@@ -222,27 +219,25 @@ string MainApplication::fName(string baseName)
     fileName = baseName + convert.str() + ".mat";
     return fileName;
 }
-
 //------------------------------------------------------------------------------
-
-double MainApplication::correlationFactor(vec p){
+double MainApplication::correlationFactor(vec p)
+{
     double k = 0;
-    for(int i=0;i<p.n_elem; i++)
+    for(int i=0;i<(int)p.n_elem; i++)
         k += pow(abs(p[i]),4);
 
     return 1.0/k;
 }
-
 //------------------------------------------------------------------------------
-
 void MainApplication::removeFiles()
 {
     string path;
     string command;
 
     cfg.lookupValue("systemSettings.SIpath", path);
-   // command = "cd " + path + "; ls";
+    // command = "cd " + path + "; ls";
     command = "cd " + path + "; rm *" + fName("");
     cout << command << endl;
     system(command.c_str());
 }
+//------------------------------------------------------------------------------

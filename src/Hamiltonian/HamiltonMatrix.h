@@ -29,7 +29,7 @@ public:
     HamiltonMatrix();
     HamiltonMatrix(Config *cfg, vector<bitset<BITS> >, mat, vec);
     HamiltonMatrix(const HamiltonMatrix& orig);
-    virtual ~HamiltonMatrix();
+
     
     void computeMatrixElements();
     void computeTimDepMatrixElements(int basisSize);

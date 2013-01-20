@@ -8,22 +8,14 @@
 #include "CrankNicolson.h"
 
 //------------------------------------------------------------------------------
-
-CrankNicolson::CrankNicolson() {
-}
-
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-
-CrankNicolson::CrankNicolson(Config *cfg, HamiltonMatrix *H, cx_vec C) : TimeIntegrator(cfg, H, C) {
+CrankNicolson::CrankNicolson(Config *cfg, HamiltonMatrix *H, cx_vec C) : TimeIntegrator(cfg, H, C)
+{
     n = H->getDim();
     I = eye<cx_mat>(n,n);
 }
-
 //------------------------------------------------------------------------------
-
-void CrankNicolson::stepForward() {
+void CrankNicolson::stepForward()
+{
     cx_vec CPrev = C;
    
     H1 = cx_mat(eye(n,n), 0.5*dt*H->evaluate(t+dt));
@@ -35,15 +27,4 @@ void CrankNicolson::stepForward() {
 
     t += dt;
 }
-
-//------------------------------------------------------------------------------
-
-CrankNicolson::CrankNicolson(const CrankNicolson& orig) {
-}
-
-//------------------------------------------------------------------------------
-
-CrankNicolson::~CrankNicolson() {
-}
-
 //------------------------------------------------------------------------------

@@ -6,15 +6,9 @@
  */
 
 #include "TimeIntegrator.h"
-
 //------------------------------------------------------------------------------
-
-TimeIntegrator::TimeIntegrator() {
-}
-
-//------------------------------------------------------------------------------
-
-TimeIntegrator::TimeIntegrator(Config *cfg, HamiltonMatrix *H, cx_vec C) : H(H), C(C) {
+TimeIntegrator::TimeIntegrator(Config *cfg, HamiltonMatrix *H, cx_vec C) : H(H), C(C)
+{
     try {
         N = cfg->lookup("TimeIntegration.N");
         dt = cfg->lookup("TimeIntegration.dt");
@@ -28,21 +22,9 @@ TimeIntegrator::TimeIntegrator(Config *cfg, HamiltonMatrix *H, cx_vec C) : H(H),
     cout << "dt = " << dt << endl;
 #endif
 }
-
 //------------------------------------------------------------------------------
-
-TimeIntegrator::TimeIntegrator(const TimeIntegrator& orig) {
-}
-
-//------------------------------------------------------------------------------
-
-cx_vec TimeIntegrator::getCoefficients() {
+cx_vec TimeIntegrator::getCoefficients()
+{
     return C;
 }
-
-//------------------------------------------------------------------------------
-
-TimeIntegrator::~TimeIntegrator() {
-}
-
 //------------------------------------------------------------------------------

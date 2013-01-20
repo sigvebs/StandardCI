@@ -24,16 +24,11 @@ using namespace arma;
 
 class SlaterDeterminants {
 public:
-    SlaterDeterminants();
     SlaterDeterminants(Config *cfg, vector<vec> sps);
-    SlaterDeterminants(const SlaterDeterminants& orig);
-    virtual ~SlaterDeterminants();
-    
     void createSlaterDeterminants();
     vec odometer(const vec &, int, int);
     bool checkEigenSpin(vec state);
     bitset<BITS> createBinaryState(vec state);
-    
     vector<bitset<BITS> > getSlaterDeterminants();
     vec computeSpsEnergies(vec spsEnergies);
 private:

@@ -33,21 +33,16 @@ using namespace arma;
 
 class Basis {
 public:
-    Basis();
     Basis(Config *cfg);
-    Basis(const Basis& orig);
-    virtual ~Basis();
 
     void createBasis();
     void createCartesianBasis();
     void createPolarBasis();
-
     void computeSpsEnergies();
-    vec getSpsEnergies();
-    
-    void computeInteractionelements();    
+    void computeInteractionelements();
+
     mat getInteractionElements();
-    
+    vec getSpsEnergies();
     vector<vec> getStates();
     
     // Wavefunction specifics
@@ -55,10 +50,9 @@ public:
     double waveFunction(double x, int n);
     double integrator(int p, int q, int r, int s);
     double expX(int p, int q);
-
     
 protected:
-    //Setting* systemSettings;
+    SpatialIntegrator *I;
     Config *cfg;
 
     string basisName;
@@ -66,16 +60,12 @@ protected:
     int sIntegrator;
     int coordinateType;
 
-    // To be removed
     int dim;
     int shells;
-    double w;
-    double sqrtW;
 
     int maxRange;
     
     vector<vec> states;
-    //vector<Orbital*> orbitalStates;
     WaveFunction *wf;
     mat intElements;
     vec spsEnergies;

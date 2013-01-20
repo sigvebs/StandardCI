@@ -31,8 +31,8 @@ using namespace std;
 
          /* a macro used in function pythag() */
 
-static float sqrarg;
-#define SQR(a) ((sqrarg = (a)) == 0.0 ? 0.0 : sqrarg * sqrarg)
+//static float sqrarg;
+//#define SQR(a) ((sqrarg = (a)) == 0.0 ? 0.0 : sqrarg * sqrarg)
 
 
      /* Macro definitions for integer arguments only */
@@ -52,6 +52,7 @@ typedef   struct  {   // structure definition for execution time
     // Function declarations
 
 TID time_step(int num);
+double SQR(double a);
 void  **matrix(int, int, int);
 void free_matrix(void **);
 void rk4(double *, double *, int, double, double, double  *,

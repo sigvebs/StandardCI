@@ -12,10 +12,8 @@
 
 class MonteCarloIntegrator : public SpatialIntegrator {
 public:
-    MonteCarloIntegrator();
     MonteCarloIntegrator(Config *cfg);
     MonteCarloIntegrator(const MonteCarloIntegrator& orig);
-    virtual ~MonteCarloIntegrator();
 
     virtual double integrate(const vec &p, const vec &q, const vec &r, const vec &s);
 private:

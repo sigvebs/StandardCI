@@ -6,14 +6,7 @@
  */
 
 #include "SpatialIntegrator.h"
-
 //------------------------------------------------------------------------------
-
-SpatialIntegrator::SpatialIntegrator() {
-
-}
-//------------------------------------------------------------------------------
-
 SpatialIntegrator::SpatialIntegrator(Config *cfg) {
     try {
         cfg->lookupValue("potential.a", a);
@@ -24,8 +17,8 @@ SpatialIntegrator::SpatialIntegrator(Config *cfg) {
      } catch (const SettingNotFoundException &nfex) {
         cerr << "Basis::Basis(Setting* systemSettings)::Error reading from 'systemSettings' object setting." << endl;
     }
-}//------------------------------------------------------------------------------
-
+}
+//------------------------------------------------------------------------------
 SpatialIntegrator::SpatialIntegrator(Config *cfg, WaveFunction *wf): wf(wf) {
     try {
         cfg->lookupValue("potential.a", a);
@@ -36,19 +29,7 @@ SpatialIntegrator::SpatialIntegrator(Config *cfg, WaveFunction *wf): wf(wf) {
         cerr << "Basis::Basis(Setting* systemSettings)::Error reading from 'systemSettings' object setting." << endl;
     }
 }
-
 //------------------------------------------------------------------------------
-
-SpatialIntegrator::SpatialIntegrator(const SpatialIntegrator& orig) {
-}
-
-//------------------------------------------------------------------------------
-
-SpatialIntegrator::~SpatialIntegrator() {
-}
-
-//------------------------------------------------------------------------------
-
 double SpatialIntegrator::hermitePolynomial(const int degree, const double x) {
     double hermite_polynomial;
 

@@ -26,6 +26,7 @@ int main(int argc, char** argv) {
 
     // A little output to help notice when the program is finished executing
     //    int ret = system("zenity --info --text='Completed: Qunatum Dynamics computaion using the Standard Method(SM)'");
+//   system("cd ..; cd PlottingResults; python plottingOverlap.py");
     //    (void)ret;
     return 0;
 }

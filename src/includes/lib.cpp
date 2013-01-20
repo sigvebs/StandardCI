@@ -1464,12 +1464,8 @@ double rectangle_rule(double a, double b, int n, double (*func)(double)) {
 } // end rectangle_rule 
 
 // Calculates the factorial of n
-
 int factorial(int n) {
-    if (n <= 1)
-        return 1;
-    else
-        return n * factorial(n - 1);
+    return  n > 0 ? n * factorial(n-1) : 1;
 }
 
 /*
@@ -1480,8 +1476,63 @@ int factorial(int n) {
  ** sequence. Any large MBIG, and any small (but still large) MSEED
  ** can be substituted for the present values. 
  */
-#if 1
 
+bool fexists(const char *filename) {
+    ifstream ifile(filename);
+    return ifile;
+}
+
+#if 1
+void gauher(double *x, double *w, int n) {
+    {
+        const double eps=1.0e-14,pim4=0.7511255444649425;
+        const int MAXIT=10;
+        int i,its,j,m;
+        double p1,p2,p3,pp,z,z1;
+
+        m=(n+1)/2;
+        for (i=0;i<m;i++) {
+            if (i == 0) {
+                z=sqrt(double(2*n+1))-1.85575*pow(double(2*n+1),-0.16667);
+            } else if (i == 1) {
+                z -= 1.14*pow(double(n),0.426)/z;
+            } else if (i == 2) {
+                z=1.86*z-0.86*x[0];
+            } else if (i == 3) {
+                z=1.91*z-0.91*x[1];
+            } else {
+                z=2.0*z-x[i-2];
+            }
+            for (its=0;its<MAXIT;its++) {
+                p1=pim4;
+                p2=0.0;
+                for (j=0;j<n;j++) {
+                    p3=p2;
+                    p2=p1;
+                    p1=z*sqrt(2.0/(j+1))*p2-sqrt(double(j)/(j+1))*p3;
+                }
+                pp=sqrt(double(2*n))*p2;
+                z1=z;
+                z=z1-p1/pp;
+                if (fabs(z-z1) <= eps) break;
+            }
+            if (its >= MAXIT)
+                cout << "too many iterations in gauher";
+            x[i]=z;
+            x[n-1-i] = -z;
+            w[i]=2.0/(pp*pp);
+            w[n-1-i]=w[i];
+        }
+    }
+}
+#endif
+
+double SQR(double a)
+{
+ return a*a;
+}
+
+#if 0
 void gauher(double x[], double w[], int n) {
     switch (n) {
 
@@ -1812,109 +1863,5 @@ void gauher(double x[], double w[], int n) {
             w[126] = 0.1250449757709172E-100;
             break;
     }
-}
-#endif
-
-bool fexists(const char *filename) {
-    ifstream ifile(filename);
-    return ifile;
-}
-
-#if 0
-void gauher(double *x, double *w, int n) {
-    const double eps = 1.0e-17;
-    const double pim4 = 0.7511255444649425;
-    const int maxit = 10;
-    int i, its, j, m;
-    double p1, p2, p3, pp, z, z1;
-
-    m = (n + 1) / 2;
-    for (i = 0; i < m; i++) {
-        if (i == 0) {
-            z = sqrt(double(2 * n + 1)) - 1.85575 * pow(double(2 * n + 1), -0.16667);
-        } else if (i == 1) {
-            z -= 1.14 * pow(double(n), 0.426) / z;
-        } else if (i == 2) {
-            z = 1.86 * z - 0.86 * x[0];
-        } else if (i == 3) {
-            z = 1.91 * z - 0.91 * x[1];
-        } else {
-            z = 2.0 * z - x[i - 2];
-        }
-        for (its = 0; its < maxit; its++) {
-            p1 = pim4;
-            p2 = 0.0;
-            for (j = 0; j < n; j++) {
-                p3 = p2;
-                p2 = p1;
-                p1 = z * sqrt(2.0 / (j + 1)) * p2 - sqrt(double(j) / (j + 1)) * p3;
-            }
-            pp = sqrt(double(2 * n)) * p2;
-            z1 = z;
-            z = z1 - p1 / pp;
-            if (fabs(z - z1) <= eps) break;
-        }
-        if (its >= maxit) {
-            cout << "too many iterations in gauher";
-            exit(1);
-        }
-        x[i] = z;
-        x[n - 1 - i] = -z;
-        w[i] = 2.0 / (pp * pp);
-        w[n - 1 - i] = w[i];
-    }
-  
-    /*
-    //    void nrerror(char error_text[]);
-    int maxit = 10;
-    double eps = 3.0e-14;
-    int i, its, j, m;
-    double p1, p2, p3, pp, z, z1;
-
-    m = (n + 1) / 2;
-    for (i = 1; i <= m; i++) {
-        if (i == 1) {
-            z = sqrt((double) (2 * n + 1)) - 1.85575 * pow((double) (2 * n + 1), -0.16667);
-        } else if (i == 2) {
-            z -= 1.14 * pow((double) n, 0.426) / z;
-        } else if (i == 3) {
-            z = 1.86 * z - 0.86 * x[0];
-            //            z = 1.86 * z - 0.86 * x[1];
-        } else if (i == 4) {
-            z = 1.91 * z - 0.91 * x[1];
-            //            z = 1.91 * z - 0.91 * x[2];
-        } else {
-            z = 2.0 * z - x[i - 1];
-            //            z = 2.0 * z - x[i - 2];
-        }
-        for (its = 1; its <= maxit; its++) {
-            p1 = PIM4;
-            p2 = 0.0;
-            for (j = 1; j <= n; j++) {
-                p3 = p2;
-                p2 = p1;
-                p1 = z * sqrt(2.0 / j) * p2 - sqrt(((double) (j - 1)) / j) * p3;
-            }
-            pp = sqrt((double) 2 * n) * p2;
-            z1 = z;
-            z = z1 - p1 / pp;
-            if (fabs(z - z1) <= eps) break;
-        }
-        if (its > maxit) {
-            cout << "too many iterations in gauher";
-            exit(1);
-        }
-        //        if (its > MAXIT) nrerror("too many iterations in gauher");
-        x[i - 1] = z;
-        x[n - i] = -z;
-        w[i - 1] = 2.0 / (pp * pp);
-        w[n - i] = w[i - 1];
-
-        //        x[i] = z;
-        //        x[n + 1 - i] = -z;
-        //        w[i] = 2.0 / (pp * pp);
-        //        w[n + 1 - i] = w[i];
-    }
-     */
 }
 #endif

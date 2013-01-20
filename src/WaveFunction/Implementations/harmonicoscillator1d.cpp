@@ -20,10 +20,13 @@ double HarmonicOscillator1d::evaluate(const vec &x, const vec &y)
 //------------------------------------------------------------------------------
 double HarmonicOscillator1d::getCoefficient()
 {
-    return w / (PI * sqrt(pow(2, p[1] + q[1] + r[1] + s[1])
-            * factorial(p[1]) * factorial(q[1]) * factorial(r[1]) * factorial(s[1])));
+    return w / (PI
+            * sqrt(pow(2, p[1] + q[1] + r[1] + s[1])
+            * factorial(p[1])
+            * factorial(q[1])
+            * factorial(r[1])
+            * factorial(s[1])));
 }
-
 //------------------------------------------------------------------------------
 double HarmonicOscillator1d::getEnergy(vec state)
 {

@@ -25,14 +25,10 @@ using namespace arma;
 
 class SpatialIntegrator {
 public:
-    SpatialIntegrator();
     SpatialIntegrator(Config *cfg);
     SpatialIntegrator(Config *cfg, WaveFunction *wf);
     SpatialIntegrator(const SpatialIntegrator& orig);
-    virtual ~SpatialIntegrator();
-
     virtual double integrate(const vec &p, const vec &q, const vec &r, const vec &s) = 0;
-
 protected:
     WaveFunction *wf;
     int dim;

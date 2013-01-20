@@ -8,12 +8,6 @@
 #include "MonteCarloIntegrator.h"
 
 //------------------------------------------------------------------------------
-
-MonteCarloIntegrator::MonteCarloIntegrator() {
-}
-
-//------------------------------------------------------------------------------
-
 MonteCarloIntegrator::MonteCarloIntegrator(Config *cfg) : SpatialIntegrator(cfg) {
 
     try {
@@ -33,9 +27,7 @@ MonteCarloIntegrator::MonteCarloIntegrator(Config *cfg) : SpatialIntegrator(cfg)
     cout << "idum = " << idum << endl;
 #endif
 }
-
 //------------------------------------------------------------------------------
-
 double MonteCarloIntegrator::integrate(const vec &p, const vec &q, const vec &r, const vec &s) {
     double I;
     double x, y;
@@ -59,14 +51,5 @@ double MonteCarloIntegrator::integrate(const vec &p, const vec &q, const vec &r,
     cout << "MonteCarloIntegrator \t= " << I << "\t L = " << L << "\t MC samples = " << mcSamples << endl;
 #endif
     return I;
-}
-//------------------------------------------------------------------------------
-
-MonteCarloIntegrator::MonteCarloIntegrator(const MonteCarloIntegrator& orig) {
-}
-
-//------------------------------------------------------------------------------
-
-MonteCarloIntegrator::~MonteCarloIntegrator() {
 }
 //------------------------------------------------------------------------------

@@ -6,10 +6,7 @@
  */
 
 #include "GaussLaguerreIntegrator.h"
-//------------------------------------------------------------------------------
-GaussLaguerreIntegrator::GaussLaguerreIntegrator()
-{
-}
+
 //------------------------------------------------------------------------------
 GaussLaguerreIntegrator::GaussLaguerreIntegrator(Config *cfg, WaveFunction *wf) : SpatialIntegrator(cfg, wf)
 {
@@ -21,32 +18,28 @@ GaussLaguerreIntegrator::GaussLaguerreIntegrator(Config *cfg, WaveFunction *wf) 
         cerr << "Basis::Basis(Config *cfg)::Error reading from 'systemSettings' object setting." << endl;
     }
 
-#if DEBUG
-    cout << "GaussLaguerreIntegrator(Setting* systemSettings)" << endl;
-    cout << "N = " << N << endl;
-    cout << "L = " << L << endl;
-#endif
     x_ = zeros(dim);
     y_ = zeros(dim);
     x = new double[N];
     w1 = new double[N];
     gauleg(-L, L, x, w1, N);
+
+#if DEBUG
+    cout << "GaussLaguerreIntegrator(Setting* systemSettings)" << endl;
+    cout << "N = " << N << endl;
+    cout << "L = " << L << endl;
+#endif
 }
 //------------------------------------------------------------------------------
 double GaussLaguerreIntegrator::integrate(const vec &p, const vec &q, const vec &r, const vec &s)
 {
+    double I = 0;
     wf->setQuantumNumber(p,q,r,s);
-
-    double I = 1;
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
-            for (int k = 0; k < N; k++) {
-                for (int l = 0; l < N; l++) {
-                    x_ << x[i] << x[j];
-                    y_ << x[k] << x[l];
-                    I += w1[i] * w1[j] * w1[k] *w1[l] * wf->evaluate(x_, y_);
-                }
-            }
+            x_[0] = x[i];
+            y_[0] = x[j];
+            I += w1[i] * w1[j] * wf->evaluate(x_, y_);
         }
     }
     I *= wf->getCoefficient();
@@ -56,7 +49,8 @@ double GaussLaguerreIntegrator::integrate(const vec &p, const vec &q, const vec 
     return I;
 }
 //------------------------------------------------------------------------------
-GaussLaguerreIntegrator::~GaussLaguerreIntegrator() {
+GaussLaguerreIntegrator::~GaussLaguerreIntegrator()
+{
     delete x;
     delete w1;
 }
