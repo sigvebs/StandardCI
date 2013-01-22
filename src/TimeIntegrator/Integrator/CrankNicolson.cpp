@@ -19,7 +19,7 @@ void CrankNicolson::stepForward()
     cx_vec CPrev = C;
    
     H1 = cx_mat(eye(n,n), 0.5*dt*H->evaluate(t+dt));
-    H2 = cx_mat(eye(n,n), -0.5*dt*H->evaluate(t)); 
+    H2 = cx_mat(eye(n,n), -0.5*dt*H->evaluate(t));
     
     H1 = inv(H1);
     

@@ -32,15 +32,15 @@ double GaussHermiteIntegrator::integrate(const vec &p, const vec &q, const vec &
     double I = 0;
     double A;
     for (int i = 0; i < N; i++) {
-        A = w1[i] * hermitePolynomial(p[1], x[i]) * hermitePolynomial(r[1], x[i]);
+        A = w1[i] * hermitePolynomial(p[2], x[i]) * hermitePolynomial(r[2], x[i]);
         for (int j = 0; j < N; j++) {
             I += A * w1[j]
-                    * hermitePolynomial(q[1], x[j])
-                    * hermitePolynomial(s[1], x[j])
+                    * hermitePolynomial(q[2], x[j])
+                    * hermitePolynomial(s[2], x[j])
                     / (sqrt(pow(x[i] - x[j], 2) / w + aa));
         }
     }
-    I *= 1 / (PI * sqrt(pow(2, p[1] + q[1] + r[1] + s[1]) * factorial(p[1]) * factorial(q[1]) * factorial(r[1]) * factorial(s[1])));
+    I *= 1 / (PI * sqrt(pow(2, p[2] + q[2] + r[2] + s[2]) * factorial(p[2]) * factorial(q[2]) * factorial(r[2]) * factorial(s[2])));
 
 #if DEBUG
     cout << "GH integration = " << I << endl;

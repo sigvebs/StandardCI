@@ -36,18 +36,18 @@ double MonteCarloIntegrator::integrate(const vec &p, const vec &q, const vec &r,
         x = (ran3(&idum) - 0.5) * L;
         y = (ran3(&idum) - 0.5) * L;
         I += exp(-w * (x*x + y*y))
-                * hermitePolynomial(p[1], sqrtW * x)
-                * hermitePolynomial(q[1], sqrtW * y)
-                * hermitePolynomial(r[1], sqrtW * x)
-                * hermitePolynomial(s[1], sqrtW * y)
+                * hermitePolynomial(p[2], sqrtW * x)
+                * hermitePolynomial(q[2], sqrtW * y)
+                * hermitePolynomial(r[2], sqrtW * x)
+                * hermitePolynomial(s[2], sqrtW * y)
                 / (sqrt(pow(x - y, 2) + aa));
     }
-    I *= w / (PI * sqrt(pow(2, p[1] + q[1] + r[1] + s[1]) * factorial(p[1]) * factorial(q[1]) * factorial(r[1]) * factorial(s[1])));
+    I *= w / (PI * sqrt(pow(2, p[2] + q[2] + r[2] + s[2]) * factorial(p[2]) * factorial(q[2]) * factorial(r[2]) * factorial(s[2])));
     I /= mcSamples;
     I *= L*L;
 
 #if DEBUG
-    cout << "p = " << p[1] << " q = " << q[1] << " r = " << r[1] << " s = " << s[1] << endl;
+    cout << "p = " << p[2] << " q = " << q[2] << " r = " << r[2] << " s = " << s[2] << endl;
     cout << "MonteCarloIntegrator \t= " << I << "\t L = " << L << "\t MC samples = " << mcSamples << endl;
 #endif
     return I;

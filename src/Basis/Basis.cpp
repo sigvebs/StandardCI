@@ -67,7 +67,7 @@ void Basis::createCartesianBasis()
 {
     // Generating all single particle states and energies
     // TODO: generalize to different quantum numbers.
-    vec state = zeros(4);
+    vec state = zeros(dim + 2);
 
     switch (dim) {
     case 1:
@@ -76,9 +76,8 @@ void Basis::createCartesianBasis()
                 vec quantumNumbers(1);
                 quantumNumbers[0] = n;
                 state(0) = states.size();
-                state(1) = n;
-                state(2) = 0;
-                state(3) = spin;
+                state(1) = spin;
+                state(2) = n;
                 states.push_back(state);
             }
         }
@@ -89,11 +88,10 @@ void Basis::createCartesianBasis()
                 for (int ny = 0; ny <= s; ny++) {
                     if(nx + ny == s){
                         for (int spin = 1; spin >= -1; spin -= 2) {
-
                             state(0) = states.size();
-                            state(1) = nx;
-                            state(2) = ny;
-                            state(3) = spin;
+                            state(1) = spin;
+                            state(2) = nx;
+                            state(3) = ny;
                             states.push_back(state);
                         }
                     }
@@ -116,7 +114,7 @@ void Basis::createCartesianBasis()
 //------------------------------------------------------------------------------
 void Basis::createPolarBasis()
 {
-    vec state(4);
+    vec state(dim +2);
     switch (dim) {
     case 1:
         cerr << "A polar basis in 1d does not make sense..." << endl;
@@ -130,16 +128,16 @@ void Basis::createPolarBasis()
 
                         // Spin up
                         state(0) = states.size();
-                        state(1) = i;
-                        state(2) = l;
-                        state(3) = 1;
+                        state(1) = 1;
+                        state(2) = i;
+                        state(3) = l;
                         states.push_back(state);
 
                         // Spin down
                         state(0) = states.size();
-                        state(1) = i;
-                        state(2) = l;
-                        state(3) = -1;
+                        state(1) = -1;
+                        state(2) = i;
+                        state(3) = l;
                         states.push_back(state);
                     }
                 }
@@ -147,6 +145,7 @@ void Basis::createPolarBasis()
         }
         break;
     }
+    cout << states.size() << " orbitals created" << endl;
 #if DEBUG
     cout << "void Basis::createPolarBasis()" << endl;
     for (int i = 0; i < states.size(); i++) {
@@ -177,11 +176,11 @@ void Basis::computeInteractionelements()
                     E = 0;
 
                     // Anti-symmetrized matrix elements
-                    if (states[p][3] == states[r][3] && states[q][3] == states[s][3]) {
+                    if (states[p][1] == states[r][1] && states[q][1] == states[s][1]) {
                         E += I->integrate(states[p], states[q], states[r], states[s]);
                     }
 
-                    if (states[p][3] == states[s][3] && states[q][3] == states[r][3]) {
+                    if (states[p][1] == states[s][1] && states[q][1] == states[r][1]) {
                         E -= I->integrate(states[p], states[q], states[s], states[r]);
                     }
 
