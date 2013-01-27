@@ -7,6 +7,8 @@
 
 #include <cstdlib>
 #include "src/MainApplication.h"
+#include "src/Testing/testing.h"
+#include "src/headers.h"
 
 using namespace std;
 
@@ -14,6 +16,18 @@ using namespace std;
  * 
  */
 int main(int argc, char** argv) {
+
+    // Testing algorithms
+    if(TESTING){
+        cout << "Testing" << endl;
+//        Testing *T = new Testing();
+//        T->runTests();
+        Testing T;
+        T.runTests();
+        return 0;
+    }
+
+    // Main application
     MainApplication *app;
 
     if (argc == 2)
