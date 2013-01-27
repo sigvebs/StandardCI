@@ -17,15 +17,10 @@
 #include <libconfig.h++>
 
 #include "../headers.h"
-#include "SpatialIntegrator/SpatialIntegrator.h"
-#include "SpatialIntegrator/MonteCarloIntegrator.h"
-#include "SpatialIntegrator/GaussLaguerreIntegrator.h"
-#include "SpatialIntegrator/GaussHermiteIntegrator.h"
-#include "SpatialIntegrator/interactonintegrator.h"
 #include "../includes/lib.h"
+
+#include "SpatialIntegrator/SpatialIntegrator.h"
 #include "../WaveFunction/wavefunction.h"
-#include "../WaveFunction/Implementations/harmonicoscillator1d.h"
-#include "../WaveFunction/Implementations/harmonicoscillator2d.h"
 
 using namespace libconfig;
 using namespace std;
@@ -40,6 +35,8 @@ public:
     void createPolarBasis();
     void computeSpsEnergies();
     void computeInteractionelements();
+    void setIntegrator(SpatialIntegrator *I);
+    void setWaveFunction(WaveFunction *wf);
 
     mat getInteractionElements();
     vec getSpsEnergies();

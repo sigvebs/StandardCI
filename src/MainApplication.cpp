@@ -38,9 +38,51 @@ void MainApplication::runConfiguration() {
     string fileNameInteractionElements = createFileName("interactionElements");
     string fileNameOrbitalElements = createFileName("orbitalElements");
 
+    // Setting the type of basis
+    WaveFunction *wf;
+    int dim = cfg.lookup("systemSettings.dim");
+
+    switch(dim){
+    case 1:
+        wf = new HarmonicOscillator1d(&cfg);
+        break;
+    case 2:
+        wf = new HarmonicOscillator2d(&cfg);
+        break;
+    }
+
+    // Setting the integrator
+    SpatialIntegrator *I;
+    int spatialIntegrator;
+    cfg.lookupValue("spatialIntegration.integrator", spatialIntegrator);
+
+    switch (spatialIntegrator) {
+    case MONTE_CARLO:
+        I = new MonteCarloIntegrator(&cfg);
+        break;
+    case GAUSS_LAGUERRE:
+        I = new GaussLaguerreIntegrator(&cfg, wf);
+        break;
+    case GAUSS_HERMITE:
+        I = new GaussHermiteIntegrator(&cfg);
+        break;
+    case INTERACTION_INTEGRATOR:
+        I = new InteractonIntegrator(&cfg);
+        break;
+    case MONTE_CARLO_IS:
+        I = new MonteCarloImportanceSampled(&cfg);
+        break;
+    }
+
+    cout << "spatialIntegrator = " << spatialIntegrator << endl;
+
+    // Loading interaction elements and orbital elements from file
+    // New elements are generated if needed.
     if (!interactionElements.load(fileNameInteractionElements)
             || !orbitalElements.load(fileNameOrbitalElements)) {
         cout << "Generating new orbital and interaction elements" << endl;
+        basis.setIntegrator(I);
+        basis.setWaveFunction(wf);
         basis.computeInteractionelements();
         basis.computeSpsEnergies();
 
@@ -51,6 +93,8 @@ void MainApplication::runConfiguration() {
         orbitalElements.save(fileNameOrbitalElements);
     } else
         cout << "Interaction and orbital matrix elements found. Loading matrices from file." << endl;
+
+    cout << interactionElements << endl;
 
     // Setting up all Slater Determinants
     vector<vec> states = basis.getStates();
@@ -92,12 +136,11 @@ void MainApplication::runConfiguration() {
         eigvec.save(fileNameEigvec);
     } else
         cout << "Hamiltonian eigenvalues and eigenvectors loaded from file." << endl;
+
     // Printing results
-    int integrator;
-    cfg.lookupValue("spatialIntegration.integrator", integrator);
     int samples = 0;
 
-    switch (integrator) {
+    switch (spatialIntegrator) {
     case MONTE_CARLO:
         cfg.lookupValue("spatialIntegration.MonteCarlo.samples", samples);
         break;
@@ -114,7 +157,7 @@ void MainApplication::runConfiguration() {
     double w = cfg.lookup("systemSettings.w");
     cout << "\nIntegrator \t Shells \t Orbitals \t w \t Energy \t K \t Samples \n";
     cout << "-------------------------------------------------------------------------\n"
-         << integrator << " \t\t "
+         << spatialIntegrator << " \t\t "
          << (int) cfg.lookup("systemSettings.shells") << " \t\t "
          << orbitalElements.size() << " \t\t "
          << w << " \t "
@@ -147,6 +190,9 @@ void MainApplication::runConfiguration() {
             break;
         case CRANK_NICOLSON:
             T = new CrankNicolson(&cfg, &H, C0);
+            break;
+        case EXPONENTIAL:
+            T = new ExponentialPropagation(&cfg, &H, C0);
             break;
         }
 
@@ -212,6 +258,8 @@ string MainApplication::fName(string baseName)
         cfg.lookupValue("spatialIntegration.GaussHermite.samples", samples);
     else if (integrator == INTERACTION_INTEGRATOR)
         samples = 0;
+    else if (integrator == MONTE_CARLO_IS)
+        cfg.lookupValue("spatialIntegration.MonteCarloIs.samples", samples);
 
     ostringstream convert;
     convert << "_basisType-" << basisType << "_coordinateType-"<< coordinateType << "_dim-" << dim << "_integrator-" << integrator << "_samples-" << samples << "_nParticles-" << nParticles << "_w-" << w << "_L-" << L << "_shells-" << shells ;

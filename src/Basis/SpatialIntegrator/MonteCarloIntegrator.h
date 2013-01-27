@@ -9,6 +9,7 @@
 #define	MONTECARLOINTEGRATOR_H
 
 #include "SpatialIntegrator.h"
+#include <math.h>
 
 class MonteCarloIntegrator : public SpatialIntegrator {
 public:

@@ -33,8 +33,9 @@ GaussLaguerreIntegrator::GaussLaguerreIntegrator(Config *cfg, WaveFunction *wf) 
 //------------------------------------------------------------------------------
 double GaussLaguerreIntegrator::integrate(const vec &p, const vec &q, const vec &r, const vec &s)
 {
-    double I = 0;
+    double I = 0;    
     wf->setQuantumNumber(p,q,r,s);
+
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             x_[0] = x[i];
@@ -42,6 +43,22 @@ double GaussLaguerreIntegrator::integrate(const vec &p, const vec &q, const vec 
             I += w1[i] * w1[j] * wf->evaluate(x_, y_);
         }
     }
+
+    /*
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            for (int k = 0; k < N; k++) {
+                for (int l = 0; l < N; l++) {
+                    x_[0] = x[i];
+                    x_[1] = x[j];
+                    y_[0] = x[k];
+                    y_[1] = x[l];
+                    I += w1[i] * w1[j] * w1[k] * w1[l] * wf->evaluate(x_, y_);
+                }
+            }
+        }
+    }
+    */
     I *= wf->getCoefficient();
 #if DEBUG
     cout << "GL integration = " << I << endl;

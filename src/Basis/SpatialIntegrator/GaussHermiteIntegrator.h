@@ -12,7 +12,7 @@
 
 class GaussHermiteIntegrator : public SpatialIntegrator {
 public:
-    GaussHermiteIntegrator(Config *cfg);
+    GaussHermiteIntegrator(Config* cfg);
     GaussHermiteIntegrator(const GaussHermiteIntegrator& orig);
     virtual double integrate(const vec &p, const vec &q, const vec &r, const vec &s);
 private:

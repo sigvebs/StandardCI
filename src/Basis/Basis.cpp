@@ -14,40 +14,15 @@ Basis::Basis(Config *cfg) : cfg(cfg)
         dim             = cfg->lookup("systemSettings.dim");
         coordinateType  = cfg->lookup("systemSettings.coordinateType");
         shells          = cfg->lookup("systemSettings.shells");
-        sIntegrator     = cfg->lookup("spatialIntegration.integrator");
     } catch (const SettingNotFoundException &nfex) {
         cerr << "Basis::Basis(Setting* systemSettings)::Error reading from 'systemSettings' object setting." << endl;
-    }
-
-    // Setting the type of basis
-    switch(dim){
-    case 1:
-        wf = new HarmonicOscillator1d(cfg);
-        break;
-    case 2:
-        wf = new HarmonicOscillator2d(cfg);
-        break;
-    }
-
-    // Setting the integrator
-    switch (sIntegrator) {
-    case MONTE_CARLO:
-        I = new MonteCarloIntegrator(cfg);
-        break;
-    case GAUSS_LAGUERRE:
-        I = new GaussLaguerreIntegrator(cfg, wf);
-        break;
-    case GAUSS_HERMITE:
-        I = new GaussHermiteIntegrator(cfg);
-        break;
-    case INTERACTION_INTEGRATOR:
-        I = new InteractonIntegrator(cfg);
-        break;
     }
 
 #if DEBUG
     cout << "Basis::Basis(Setting* systemSettings)" << endl;
     cout << "dim = " << dim << endl;
+    cout << "coordinateType = " << coordinateType << endl;
+    cout << "shells = " << shells << endl;
 #endif
 }
 //------------------------------------------------------------------------------ 
@@ -66,7 +41,6 @@ void Basis::createBasis()
 void Basis::createCartesianBasis()
 {
     // Generating all single particle states and energies
-    // TODO: generalize to different quantum numbers.
     vec state = zeros(dim + 2);
 
     switch (dim) {
@@ -205,6 +179,16 @@ void Basis::computeInteractionelements()
     cout << "void Basis::computeInteractionelements()" << endl;
     cout << "InteractionELements = " << interactionElements.size() << endl;
 #endif
+}
+//------------------------------------------------------------------------------
+void Basis::setIntegrator(SpatialIntegrator *I)
+{
+    this->I = I;
+}
+//------------------------------------------------------------------------------
+void Basis::setWaveFunction(WaveFunction *wf)
+{
+    this->wf = wf;
 }
 //------------------------------------------------------------------------------ 
 mat Basis::getInteractionElements()
