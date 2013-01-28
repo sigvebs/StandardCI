@@ -18,7 +18,7 @@ SlaterDeterminants::SlaterDeterminants(Config *cfg, vector<vec> sps) : cfg(cfg),
     } catch (const SettingNotFoundException &nfex) {
         cerr << "SlaterDeterminants(Config *cfg, vector<vec> sps)::Error reading from 'systemSettings' object setting." << endl;
     }
-#if DEBUG
+#if 1
     cout << "SlaterDeterminants(Config *cfg, vector<vec> sps)" << endl;
     cout << "nParticles = " << nParticles << endl;
     cout << "conservedEigenSpin = " << conservedEigenSpin << endl;
@@ -62,7 +62,7 @@ bool SlaterDeterminants::checkEigenSpin(vec state)
 
     // Summing up the total eigenspin
     for (int i = 0; i < nParticles; i++) {
-        sumEigenSpin += (sps[state(i)])[3];
+        sumEigenSpin += (sps[state(i)])[1];
     }
 
     // Checking if the total eigenspin of a state is conserved
